@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import CoreLocation
+import SwiftData
 
 @main
 struct AthleteWeatherApp: App {
+    @StateObject var weatherForSelection = WeatherForSelection()
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(weatherForSelection)
         }
     }
 }

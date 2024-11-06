@@ -1,0 +1,46 @@
+{
+"coord": {
+"lon": 15.0562,
+"lat": 50.7671
+},
+"weather": [
+{
+"id": 804,
+"main": "Clouds",
+"description": "overcast clouds",
+"icon": "04d"
+}
+],
+"base": "stations",
+"main": {
+"temp": 287.92,
+"feels_like": 286.94,
+"temp_min": 287.05,
+"temp_max": 289.87,
+"pressure": 1024,
+"humidity": 57,
+"sea_level": 1024,
+"grnd_level": 968
+},
+"visibility": 10000,
+"wind": {
+"speed": 4.02,
+"deg": 130,
+"gust": 9.83
+},
+"clouds": {
+"all": 100
+},
+"dt": 1729427400,
+"sys": {
+"type": 2,
+"id": 47775,
+"country": "CZ",
+"sunrise": 1729402274,
+"sunset": 1729439848
+},
+"timezone": 7200,
+"id": 3071961,
+"name": "Panama",
+"cod": 200
+}
