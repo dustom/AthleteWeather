@@ -12,6 +12,7 @@ struct CurrentWeatherView: View {
     @EnvironmentObject var weatherForSelection: WeatherForSelection
     @StateObject private var locationManager = LocationManager()
     @ObservedObject private var vm = CurrentWeatherViewModel()
+    @ObservedObject var locationSearchService = LocationSearchService()
     
     
     @State private var typingLocation = false
@@ -33,47 +34,68 @@ struct CurrentWeatherView: View {
                         ProgressView()
                             .frame(width: geo.size.width, height: geo.size.height)
                     case .success:
-                        HStack {
-                            Spacer()
-                            VStack {
-                                Text(vm.weatherSource.locationName)
-                                    .font(.largeTitle)
-                                    .foregroundStyle(.primary)
-                                    .multilineTextAlignment(.center)
-                                    .minimumScaleFactor(0.5)
-                                Text(vm.weatherSource.tempMinMax)
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
+                        if !typingLocation  {
+                            HStack {
+                                Spacer()
+                                VStack {
+                                    Text(vm.weatherSource.locationName)
+                                        .font(.largeTitle)
+                                        .foregroundStyle(.primary)
+                                        .multilineTextAlignment(.center)
+                                        .minimumScaleFactor(0.5)
+                                    Text(vm.weatherSource.tempMinMax)
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                VStack {
+                                    Image(systemName: vm.weatherSource.weatherIcon)
+                                        .font(.largeTitle)
+                                        .symbolEffect(.breathe)
+                                    Text(vm.weatherSource.weatherDescription)
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
                             }
-                            Spacer()
-                            VStack {
-                                Image(systemName: vm.weatherSource.weatherIcon)
-                                    .font(.largeTitle)
-                                    .symbolEffect(.breathe)
-                                Text(vm.weatherSource.weatherDescription)
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
+                            .frame(height: 90)
+                            .padding()
+                            
+                            
+                            HStack {
+                                ScrollView {
+                                    LazyVGrid(columns: [GridItem(), GridItem()]) {
+                                        // the propertiesArray includes all weather properties like temperature, humidity etc. - the user can choose which properties they want to see on the Current Weather tab so this array has to be filtered to show only selected properties, default settings include all of them
+                                        let displayProperties = vm.propertiesArray.filter {$0.info.isIncluded}
+                                        ForEach(0..<displayProperties.count, id: \.self) { property in
+                                            //only wind uses a different view - in addition to speed it shows direction using an arrow and shortcuts for cardinal points
+                                            if displayProperties[property].name == "Wind" {
+                                                WindView(windSpeed: vm.weatherSource.windSpeed, windDegree: vm.weatherSource.windDegree, width: geo.size.width/2.3)
+                                            } else {
+                                                WeatherPropertyView(data: displayProperties[property].data, name: displayProperties[property].name, icon: displayProperties[property].icon, width: geo.size.width/2.3)
+                                            }
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
                             }
-                            Spacer()
-                        }
-                        .frame(height: 90)
-                        .padding()
-                        
-                        HStack {
-                            ScrollView {
-                                LazyVGrid(columns: [GridItem(), GridItem()]) {
-                                    // the propertiesArray includes all weather properties like temperature, humidity etc. - the user can choose which properties they want to see on the Current Weather tab so this array has to be filtered to show only selected properties, default settings include all of them
-                                    let displayProperties = vm.propertiesArray.filter {$0.info.isIncluded}
-                                    ForEach(0..<displayProperties.count, id: \.self) { property in
-                                        //only wind uses a different view - in addition to speed it shows direction using an arrow and shortcuts for cardinal points
-                                        if displayProperties[property].name == "Wind" {
-                                            WindView(windSpeed: vm.weatherSource.windSpeed, windDegree: vm.weatherSource.windDegree, width: geo.size.width/2.3)
-                                        } else {
-                                            WeatherPropertyView(data: displayProperties[property].data, name: displayProperties[property].name, icon: displayProperties[property].icon, width: geo.size.width/2.3)
+                        } else {
+                            if locationSearchService.searchQuery != "" {
+                                
+                           
+                            List(locationSearchService.completions, id: \.self) { completion in
+                                    Button {
+                                        updateWeatherSearch(for: completion.title)
+                                        
+                                    } label: {
+                                        VStack(alignment: .leading) {
+                                            Text(completion.title)
+                                            Text(completion.subtitle)
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
                                         }
                                     }
                                 }
-                                .padding(.horizontal)
                             }
                         }
                         
@@ -94,9 +116,6 @@ struct CurrentWeatherView: View {
                         }
                     }
                 }
-            }
-            .onTapGesture{
-                typingLocation = false
             }
             //the cloudiness is a number between 0 and 1 and determines what part of the sky is covered with clouds given location - the background is updated based on that from clear skies (blue) to cloudy (grey)
             .background(.blue.mix(with: .gray, by: vm.weatherSource.cloudiness).opacity(0.4))
@@ -120,14 +139,14 @@ struct CurrentWeatherView: View {
                 }
             }
         }
-        .searchable(text: $searchLocation, isPresented: $typingLocation, prompt: "Search Location" )
+        .searchable(text: $locationSearchService.searchQuery, isPresented: $typingLocation, prompt: "Search Location" )
         .onSubmit(of: .search) {
             //set typing location to false to go back to the default state of the view without the searchbar selected
             typingLocation = false
             Task{
-                await vm.getWeather(for: searchLocation)
+                await vm.getWeather(for: locationSearchService.searchQuery)
                 updateSharedWeatherForSelection()
-                searchLocation = ""
+                locationSearchService.searchQuery = ""
             }
             
         }
@@ -172,6 +191,15 @@ struct CurrentWeatherView: View {
             wasSceneBackground = false
             locationManager.didFinishUpdatingLocation()
             updateSharedWeatherForSelection()
+        }
+    }
+    
+    private func updateWeatherSearch(for search: String) {
+        Task{
+            await vm.getWeather(for: search)
+            updateSharedWeatherForSelection()
+            locationSearchService.searchQuery = ""
+            typingLocation = false
         }
     }
     

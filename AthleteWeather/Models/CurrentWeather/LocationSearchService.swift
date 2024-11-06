@@ -19,6 +19,7 @@ class LocationSearchService: NSObject, ObservableObject, MKLocalSearchCompleterD
     override init() {
         completer = MKLocalSearchCompleter()
         super.init()
+        completer.resultTypes = .address
         cancellable = $searchQuery.assign(to: \.queryFragment, on: self.completer)
         completer.delegate = self
     }

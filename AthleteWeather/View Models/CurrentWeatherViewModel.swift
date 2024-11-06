@@ -37,7 +37,6 @@ class CurrentWeatherViewModel: ObservableObject {
             }
         }
         
-        
         // Initialize propertiesArray with the default values
         propertiesArray = [
             WeatherProperty(data: "",
@@ -206,4 +205,6 @@ class CurrentWeatherViewModel: ObservableObject {
         // this line just sorts the array based on the userSettings or default data -
         propertiesArray.sort(by: { $0.info.id < $1.info.id })
     }
+    
+    
 }
