@@ -17,7 +17,7 @@ AthleteWeather is designed to help endurance athletes with training preparation.
 - Hourly weather forecast for key metrics
 ![image_alt](https://github.com/dustom/AthleteWeather/blob/main/Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20-%202024-12-01%20at%2018.05.07.png?raw=true)
 
-- Clothing and nutriotion recommendation based on the weather at the selected location. Extreme conditions like wind, rain, high temperature are also considered and reflected in the recommendation.
+- Clothing and nutriotion recommendation based on the weather at the selected location. Extreme conditions like wind, rain or high temperature are also considered and reflected in the recommendation.
 ![image_alt](https://github.com/dustom/AthleteWeather/blob/main/Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20-%202024-12-01%20at%2018.27.00.png?raw=true)
   
 - User can choose which key metrics and in what order they want to see them on the main page.
