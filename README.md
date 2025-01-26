@@ -9,6 +9,7 @@ AthleteWeather is designed to help endurance athletes with training preparation.
   - GPS location via CLLocationManager
   - Location search help via MKLocalSearchCompleter
   - Weather forecast graph for key metrics using Swift Charts
+  - MVVM architecture
 
 ## Main features
 - Current weather for the user's location or for the searched location
